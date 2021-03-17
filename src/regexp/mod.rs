@@ -99,7 +99,7 @@ pub mod str {
   /// # use nom::regexp::str::re_find;
   /// # fn main() {
   /// let re = regex::Regex::new(r"\d{4}").unwrap();
-  /// let parser = re_find::<(&str, ErrorKind)>(re);
+  /// let parser = re_find::<_, (&str, ErrorKind)>(re);
   /// assert_eq!(parser("abc2019"), Ok(("", "2019")));
   /// assert_eq!(parser("abc"), Err(Err::Error(("abc", ErrorKind::RegexpFind))));
   /// assert_eq!(parser("2019-10"), Ok(("-10", "2019")));
@@ -107,8 +107,9 @@ pub mod str {
   /// ```
   #[cfg(feature = "regexp")]
   #[cfg_attr(feature = "docsrs", doc(cfg(feature = "regexp")))]
-  pub fn re_find<'a, E>(re: Regex) -> impl Fn(&'a str) -> IResult<&'a str, &'a str, E>
+  pub fn re_find<'a, R, E>(re: R) -> impl Fn(&'a str) -> IResult<&'a str, &'a str, E>
   where
+    R: Borrow<Regex>,
     E: ParseError<&'a str>,
   {
     move |i| {
@@ -131,7 +132,7 @@ pub mod str {
   /// # use nom::regexp::str::re_capture;
   /// # fn main() {
   /// let re = regex::Regex::new(r"(a)(\d)").unwrap();
-  /// let parser = re_capture::<(&str, ErrorKind)>(re);
+  /// let parser = re_capture::<_, (&str, ErrorKind)>(re);
   /// assert_eq!(parser("a1ba2"), Ok(("ba2", vec!["a1", "a", "1"])));
   /// assert_eq!(parser("abc"), Err(Err::Error(("abc", ErrorKind::RegexpCapture))));
   /// # }
@@ -141,8 +142,9 @@ pub mod str {
     feature = "docsrs",
     doc(cfg(all(feature = "regexp", feature = "alloc")))
   )]
-  pub fn re_capture<'a, E>(re: Regex) -> impl Fn(&'a str) -> IResult<&'a str, Vec<&'a str>, E>
+  pub fn re_capture<'a, R, E>(re: R) -> impl Fn(&'a str) -> IResult<&'a str, Vec<&'a str>, E>
   where
+    R: Borrow<Regex>,
     E: ParseError<&'a str>,
   {
     move |i| {
@@ -175,7 +177,7 @@ pub mod str {
   /// # use nom::regexp::str::re_captures;
   /// # fn main() {
   /// let re = regex::Regex::new(r"(a)(\d)").unwrap();
-  /// let parser = re_captures::<(&str, ErrorKind)>(re);
+  /// let parser = re_captures::<_, (&str, ErrorKind)>(re);
   /// assert_eq!(parser("a1ba2"), Ok(("", vec![vec!["a1", "a", "1"], vec!["a2", "a", "2"]])));
   /// assert_eq!(parser("abc"), Err(Err::Error(("abc", ErrorKind::RegexpCapture))));
   /// # }
@@ -185,8 +187,9 @@ pub mod str {
     feature = "docsrs",
     doc(cfg(all(feature = "regexp", feature = "alloc")))
   )]
-  pub fn re_captures<'a, E>(re: Regex) -> impl Fn(&'a str) -> IResult<&'a str, Vec<Vec<&'a str>>, E>
+  pub fn re_captures<'a, R, E>(re: R) -> impl Fn(&'a str) -> IResult<&'a str, Vec<Vec<&'a str>>, E>
   where
+    R: Borrow<Regex>,
     E: ParseError<&'a str>,
   {
     move |i| {
